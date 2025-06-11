@@ -5,9 +5,609 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>เข้าสู่ระบบ | สมัครสมาชิก - ระบบความปลอดภัยสูง</title>
   <!-- (สไตล์เดิมทั้งหมดคงไว้ไม่เปลี่ยนเพื่อประหยัดพื้นที่) -->
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .security-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-container {
+            position: relative;
+        }
+
+        .form {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: #667eea;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #e1e5e9;
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: #dc3545; }
+        .strength-fair { background: #fd7e14; }
+        .strength-good { background: #ffc107; }
+        .strength-strong { background: #28a745; }
+
+        .password-requirements {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            display: none;
+        }
+
+        .password-requirements.show {
+            display: block;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 3px;
+        }
+
+        .requirement.met {
+            color: #28a745;
+        }
+
+        .captcha-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .captcha-question {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .captcha-input {
+            width: 100px;
+            padding: 8px;
+            margin-top: 5px;
+        }
+
+        .rate-limit-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .two-factor-container {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .two-factor-input {
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 5px;
+            width: 120px;
+            margin: 0 auto;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .security-info {
+            background: rgba(40, 167, 69, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .session-info {
+            background: rgba(23, 162, 184, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #0c5460;
+        }
+
+        .switch-form {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .switch-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .switch-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .success-message, .error-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            margin-top: 2px;
+            transform: scale(1.2);
+        }
+
+        .account-lockout {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .lockout-timer {
+            font-weight: bold;
+            font-size: 18px;
+            color: #dc3545;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+                max-width: 100%;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
   <!-- (HTML เดิมทั้งหมดคงไว้ เช่น ฟอร์มล็อกอินและสมัครสมาชิก) -->
+  <div class="container">
+        <div class="security-badge">
+            🔒 SSL ปลอดภัย
+        </div>
+        
+        <div class="form-container">
+            <!-- ฟอร์มล็อกอิน -->
+            <div id="loginForm" class="form active">
+                <h2>เข้าสู่ระบบ</h2>
+                
+                <div class="security-info">
+                    🛡️ ระบบรักษาความปลอดภัยขั้นสูง: การเข้ารหัส AES-256, ตรวจสอบ IP, และ Rate Limiting
+                </div>
+                
+                <div class="account-lockout" id="accountLockout">
+                    <div>⚠️ บัญชีถูกล็อกชั่วคราว</div>
+                    <div>เหลือเวลา: <span class="lockout-timer" id="lockoutTimer">00:00</span></div>
+                </div>
+                
+                <div class="rate-limit-warning" id="rateLimitWarning">
+                    ⚠️ คุณพยายามเข้าสู่ระบบหลายครั้ง กรุณารอสักครู่
+                </div>
+                
+                <div class="success-message" id="loginSuccess"></div>
+                <div class="error-message" id="loginError"></div>
+                
+                <form id="loginFormElement">
+                    <div class="input-group">
+                        <label for="loginEmail">อีเมล</label>
+                        <input type="email" id="loginEmail" name="email" required placeholder="กรุณาใส่อีเมลของคุณ" autocomplete="username">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="loginPassword">รหัสผ่าน</label>
+                        <div class="password-container">
+                            <input type="password" id="loginPassword" name="password" required placeholder="กรุณาใส่รหัสผ่าน" autocomplete="current-password">
+                            <span class="toggle-password" onclick="togglePassword('loginPassword')">👁️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="captcha-container" id="loginCaptcha" style="display: none;">
+                        <div class="captcha-question" id="captchaQuestion">กรุณาแก้โจทย์: 5 + 3 = ?</div>
+                        <input type="number" class="captcha-input" id="captchaAnswer" placeholder="คำตอบ">
+                    </div>
+                    
+                    <div class="two-factor-container" id="twoFactorContainer">
+                        <label for="twoFactorCode">รหัส 2FA (6 หลัก)</label>
+                        <input type="text" class="two-factor-input" id="twoFactorCode" maxlength="6" placeholder="000000">
+                        <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
+                            กรุณาใส่รหัสจากแอพ Authenticator
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">จดจำการเข้าสู่ระบบ (30 วัน)</label>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="loginBtn">เข้าสู่ระบบ</button>
+                </form>
+                
+                <div class="session-info">
+                    📊 ข้อมูลเซสชัน: IP <span id="userIP">กำลังตรวจสอบ...</span> | เข้าสู่ระบบ: <span id="loginAttempts">0</span>/5 ครั้ง
+                </div>
+                
+                <div class="switch-form">
+                    ยังไม่มีบัญชี? <span class="switch-link" onclick="switchToRegister()">สมัครสมาชิก</span><br>
+                    <span class="switch-link" onclick="showForgotPassword()">ลืมรหัสผ่าน?</span>
+                </div>
+            </div>
+            
+            <!-- ฟอร์มสมัครสมาชิก -->
+            <div id="registerForm" class="form">
+                <h2>สมัครสมาชิก</h2>
+                
+                <div class="security-info">
+                    🔐 ข้อมูลของคุณจะถูกเข้ารหัสและปกป้องด้วยมาตรฐาน GDPR
+                </div>
+                
+                <div class="success-message" id="registerSuccess"></div>
+                <div class="error-message" id="registerError"></div>
+                
+                <form id="registerFormElement">
+                    <div class="input-group">
+                        <label for="registerName">ชื่อ-นามสกุล</label>
+                        <input type="text" id="registerName" name="name" required placeholder="กรุณาใส่ชื่อ-นามสกุล" autocomplete="name">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="registerEmail">อีเมล</label>
+                        <input type="email" id="registerEmail" name="email" required placeholder="กรุณาใส่อีเมลของคุณ" autocomplete="email">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="registerPassword">รหัสผ่าน</label>
+                        <div class="password-container">
+                            <input type="password" id="registerPassword" name="password" required placeholder="กรุณาใส่รหัสผ่านที่แข็งแกร่ง" autocomplete="new-password">
+                            <span class="toggle-password" onclick="togglePassword('registerPassword')">👁️</span>
+                        </div>
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="strength-bar" id="strengthBar"></div>
+                        </div>
+                        <div class="password-requirements" id="passwordRequirements">
+                            <div class="requirement" id="lengthReq">
+                                <span>❌</span> อย่างน้อย 8 ตัวอักษร
+                            </div>
+                            <div class="requirement" id="upperReq">
+                                <span>❌</span> ตัวอักษรพิมพ์ใหญ่
+                            </div>
+                            <div class="requirement" id="lowerReq">
+                                <span>❌</span> ตัวอักษรพิมพ์เล็ก
+                            </div>
+                            <div class="requirement" id="numberReq">
+                                <span>❌</span> ตัวเลข
+                            </div>
+                            <div class="requirement" id="specialReq">
+                                <span>❌</span> อักขระพิเศษ (!@#$%^&*)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="confirmPassword">ยืนยันรหัสผ่าน</label>
+                        <div class="password-container">
+                            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="กรุณายืนยันรหัสผ่าน" autocomplete="new-password">
+                            <span class="toggle-password" onclick="togglePassword('confirmPassword')">👁️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="captcha-container">
+                        <div class="captcha-question" id="registerCaptchaQuestion">กรุณาแก้โจทย์: 7 + 4 = ?</div>
+                        <input type="number" class="captcha-input" id="registerCaptchaAnswer" placeholder="คำตอบ" required>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                        <label for="agreeTerms">
+                            ฉันยอมรับ <span class="switch-link">ข้อตกลงการใช้งาน</span>, 
+                            <span class="switch-link">นโยบายความเป็นส่วนตัว</span>, และ
+                            <span class="switch-link">นโยบายความปลอดภัย</span>
+                        </label>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="enable2FA" name="enable2FA">
+                        <label for="enable2FA">🔐 เปิดใช้งานการยืนยันตัวตนแบบ 2 ขั้นตอน (แนะนำ)</label>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="registerBtn">สมัครสมาชิก</button>
+                </form>
+                
+                <div class="switch-form">
+                    มีบัญชีอยู่แล้ว? <span class="switch-link" onclick="switchToLogin()">เข้าสู่ระบบ</span>
+                </div>
+            </div>
+            
+            <!-- ฟอร์มลืมรหัสผ่าน -->
+            <div id="forgotPasswordForm" class="form">
+                <h2>ลืมรหัสผ่าน</h2>
+                
+                <div class="security-info">
+                    📧 เราจะส่งลิงก์รีเซ็ตรหัสผ่านที่ปลอดภัยไปยังอีเมลของคุณ
+                </div>
+                
+                <div class="success-message" id="forgotSuccess"></div>
+                <div class="error-message" id="forgotError"></div>
+                
+                <form id="forgotPasswordFormElement">
+                    <div class="input-group">
+                        <label for="forgotEmail">อีเมลที่ลงทะเบียน</label>
+                        <input type="email" id="forgotEmail" name="email" required placeholder="กรุณาใส่อีเมลของคุณ">
+                    </div>
+                    
+                    <div class="captcha-container">
+                        <div class="captcha-question" id="forgotCaptchaQuestion">กรุณาแก้โจทย์: 9 - 3 = ?</div>
+                        <input type="number" class="captcha-input" id="forgotCaptchaAnswer" placeholder="คำตอบ" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">ส่งลิงก์รีเซ็ตรหัสผ่าน</button>
+                </form>
+                
+                <div class="switch-form">
+                    <span class="switch-link" onclick="switchToLogin()">กลับไปหน้าเข้าสู่ระบบ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
   <script>
     // เพิ่มฟังก์ชัน simulateLogin ที่เชื่อม Google Sheets
